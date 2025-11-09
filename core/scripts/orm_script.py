@@ -107,5 +107,22 @@ def run():
     # # If not found, then:
     # # INSERT INTO core_rating (restaurant_id, user_id, rating) VALUES (1, 1, 8);
 
+    # --- Testing Validators ---
+    user = User.objects.first()
+    restaurant = Restaurant.objects.first()
+    # rating = Rating.objects.create(
+    #     restaurant=restaurant,
+    #     user=user,
+    #     rating=11 # This will raise a ValidationError due to MaxValueValidator
+    # )
+    # print(rating)
+    rating = Rating(
+        restaurant=restaurant,
+        user=user,
+        rating=11 # This will raise a ValidationError due to MaxValueValidator
+    )
+    rating.full_clean()  # This will run the validators
+    rating.save()
+    
     print(connection.queries)
     
