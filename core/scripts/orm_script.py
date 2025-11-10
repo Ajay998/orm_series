@@ -5,9 +5,9 @@ from django.contrib.auth.models import User
 def run():
 
     # restaurant = Restaurant()
-    # restaurant.name = "My Italian Restaurant"
-    # restaurant.latitude = 40.7128
-    # restaurant.longitude = -74.0060
+    # restaurant.name = "My Italian Restaurant #2"
+    # restaurant.latitude = 40.7129
+    # restaurant.longitude = -74.0061
     # restaurant.restaurant_type = Restaurant.TypeChoices.ITALIAN
     # restaurant.date_opened = timezone.now().date()
     # restaurant.website = "https://myitalianrestaurant.example.com"
@@ -52,7 +52,7 @@ def run():
     # rating = Rating.objects.create(
     #     restaurant=restaurant,
     #     user=user,
-    #     rating=10
+    #     rating=2
     # )
     # print(rating)
     # # INSERT INTO core_rating (restaurant_id, user_id, rating) VALUES (1, 1, 5);
@@ -108,21 +108,46 @@ def run():
     # # INSERT INTO core_rating (restaurant_id, user_id, rating) VALUES (1, 1, 8);
 
     # --- Testing Validators ---
-    user = User.objects.first()
-    restaurant = Restaurant.objects.first()
+    # user = User.objects.first()
+    # restaurant = Restaurant.objects.first()
     # rating = Rating.objects.create(
     #     restaurant=restaurant,
     #     user=user,
     #     rating=11 # This will raise a ValidationError due to MaxValueValidator
     # )
     # print(rating)
-    rating = Rating(
-        restaurant=restaurant,
-        user=user,
-        rating=11 # This will raise a ValidationError due to MaxValueValidator
-    )
-    rating.full_clean()  # This will run the validators
-    rating.save()
-    
+    # rating = Rating(
+    #     restaurant=restaurant,
+    #     user=user,
+    #     rating=11 # This will raise a ValidationError due to MaxValueValidator
+    # )
+    # rating.full_clean()  # This will run the validators
+    # rating.save()
+
+    # restaurant = Restaurant.objects.first()
+    # print(restaurant)
+    # restaurant.name = 'New Restaurant Name'
+    # restaurant.save(update_fields=['name']) # Only update the 'name' field
+
+    # restaurant = Restaurant.objects.all()
+    # restaurant.update(date_opened=timezone.now().date()) # Bulk update date_opened for all restaurants
+
+    # Lookups using 
+    # restaurant = Restaurant.objects.filter(name__startswith='My')
+    # print(restaurant)
+    # # SELECT * FROM core_restaurant WHERE name LIKE 'My%';
+    # print(restaurant.update(date_opened=timezone.now() - timezone.timedelta(days=365)))
+    # UPDATE core_restaurant SET date_opened = '2023-06-XX' WHERE name LIKE 'My%';
+
+    # restaurant = Restaurant.objects.first()
+    # print(restaurant.pk) # Access primary key
+    # print(restaurant.ratings.all()) # Access related ratings using related_name
+
+    # print(restaurant.delete()) # Delete restaurant and cascade delete related ratings and sales
+    # DELETE FROM core_restaurant WHERE id = 1;
+
+    Restaurant.objects.all().delete()
+    # DELETE FROM core_restaurant;
+
     print(connection.queries)
     
