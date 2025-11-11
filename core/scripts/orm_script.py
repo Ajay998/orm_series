@@ -2,6 +2,8 @@ from core.models import Restaurant, Rating, Sale
 from django.utils import timezone
 from django.db import connection
 from django.contrib.auth.models import User
+from pprint import pprint
+from django.db.models.functions import Lower
 def run():
 
     # restaurant = Restaurant()
@@ -146,8 +148,109 @@ def run():
     # print(restaurant.delete()) # Delete restaurant and cascade delete related ratings and sales
     # DELETE FROM core_restaurant WHERE id = 1;
 
-    Restaurant.objects.all().delete()
+    # Restaurant.objects.all().delete()
     # DELETE FROM core_restaurant;
+
+    # -----------------------------------------------------
+    # print(Restaurant.objects.count())
+    # print(Rating.objects.count())
+    # print(Sale.objects.count())
+
+    # Filter down to only Chinese restaurants
+    # chinese_restaurants = Restaurant.objects.filter(restaurant_type=Restaurant.TypeChoices.CHINESE)
+    # print(chinese_restaurants)
+    # SELECT * FROM core_restaurant WHERE restaurant_type = 'CHINESE';
+
+    # filter_by_name = Restaurant.objects.filter(name = 'Pizzeria 1')
+    # print(filter_by_name.count())
+    # print(filter_by_name.get()) # Get single object
+    # SELECT * FROM core_restaurant WHERE name = 'Pizzeria 1';
+
+    # get_by_type = Restaurant.objects.get(restaurant_type=Restaurant.TypeChoices.ITALIAN)
+    # print(get_by_type) # Will raise MultipleObjectsReturned if more than one object found`
+    # SELECT * FROM core_restaurant WHERE restaurant_type = 'ITALIAN';
+
+    # chinese_restaurants = Restaurant.objects.filter(restaurant_type=Restaurant.TypeChoices.CHINESE)
+    # print(chinese_restaurants.exists()) # Check if any Chinese restaurants exist
+
+    # chinese = Restaurant.TypeChoices.CHINESE
+    # restaurants = Restaurant.objects.filter(restaurant_type=chinese, name__startswith='C')
+    # print(restaurants)
+    # SELECT * FROM core_restaurant WHERE restaurant_type = 'CHINESE' AND name LIKE 'C%';
+    
+    # chinese = Restaurant.TypeChoices.CHINESE
+    # mexican = Restaurant.TypeChoices.MEXICAN
+    # indian = Restaurant.TypeChoices.INDIAN
+    # check_types = [chinese, mexican, indian]
+    # restaurants = Restaurant.objects.filter(restaurant_type__in=check_types)
+    # print(restaurants)
+    # SELECT * FROM core_restaurant WHERE restaurant_type IN ('CHINESE', 'MEXICAN', 'INDIAN');
+
+    # chinese = Restaurant.TypeChoices.CHINESE
+    # restaurant = Restaurant.objects.exclude(restaurant_type=chinese)
+    # print(restaurant)
+    # SELECT * FROM core_restaurant WHERE restaurant_type != 'CHINESE';
+
+    # Lookups
+    # print(Restaurant.objects.filter(name__lt='E'))
+    # # SELECT * FROM core_restaurant WHERE name < 'E';
+    # print(Restaurant.objects.filter(name__lte='E'))
+    # # SELECT * FROM core_restaurant WHERE name <= 'E';
+    # print(Restaurant.objects.filter(name__gt='E'))
+    # # SELECT * FROM core_restaurant WHERE name > 'E';
+    # print(Restaurant.objects.filter(name__gte='E'))
+    # # SELECT * FROM core_restaurant WHERE name >= 'E';
+
+    # sale = Sale.objects.filter(income__range=(50, 60))
+    # print(sale)
+    # SELECT * FROM core_sale WHERE income BETWEEN 50 AND 150;
+
+    # restaurant = Restaurant.objects.order_by('-name')
+    # print(restaurant)
+    # SELECT * FROM core_restaurant ORDER BY name ASC;
+
+    # restaurant = Restaurant.objects.order_by(Lower('name').desc())
+    # print(restaurant)
+    # SELECT * FROM core_restaurant ORDER BY LOWER(name) DESC;
+
+    # restaurant = Restaurant.objects.order_by('date_opened')
+    # print(restaurant)
+    # # SELECT * FROM core_restaurant ORDER BY date_opened ASC;
+
+    # restaurant = Restaurant.objects.order_by('date_opened')[0]
+    # print(restaurant)
+    # # SELECT * FROM core_restaurant ORDER BY date_opened ASC LIMIT 1;
+
+    # restaurant = Restaurant.objects.order_by('date_opened')[:5]
+    # print(restaurant)
+    # # SELECT * FROM core_restaurant ORDER BY date_opened ASC LIMIT 5;
+
+    # restaurant = Restaurant.objects.order_by('date_opened')[2:5]
+    # print(restaurant)
+    # SELECT * FROM core_restaurant ORDER BY date_opened ASC LIMIT 3 OFFSET 2;
+
+    # restaurant = Restaurant.objects.earliest('date_opened')
+    # print(restaurant)
+    # SELECT * FROM core_restaurant ORDER BY date_opened ASC LIMIT 1;
+
+    # restaurant = Restaurant.objects.latest('date_opened')
+    # print(restaurant)
+    # SELECT * FROM core_restaurant ORDER BY date_opened DESC LIMIT 1;
+
+    # ratings = Rating.objects.filter(restaurant__name__startswith='C')
+    # print(ratings)
+    # SELECT core_rating.* FROM core_rating
+    # INNER JOIN core_restaurant ON core_rating.restaurant_id = core_restaurant.id
+    # WHERE core_restaurant.name LIKE 'C%';
+
+    # chinese = Restaurant.TypeChoices.CHINESE
+    # sales = Sale.objects.filter(restaurant__restaurant_type=chinese)
+    # print(sales)
+    # SELECT core_sale.* FROM core_sale
+    # INNER JOIN core_restaurant ON core_sale.restaurant_id = core_restaurant.id
+    # WHERE core_restaurant.restaurant_type = 'CH';
+
+
 
     print(connection.queries)
     
