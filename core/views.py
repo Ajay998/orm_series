@@ -45,6 +45,10 @@ def index(request):
     return render(request, 'core/restaurant_index.html', context)
 
 def rating_index(request):
-    ratings = Rating.objects.select_related('restaurant') # Fetch all ratings with their associated restaurant in optimized query (One to Many relationship)
+    # ratings = Rating.objects.select_related('restaurant') # Fetch all ratings with their associated restaurant in optimized query (One to Many relationship)
     # SELECT * FROM core_rating INNER JOIN core_restaurant ON core_rating.restaurant_id = core_restaurant.id;
+
+    ratings = Rating.objects.only('rating', 'restaurant__name').select_related('restaurant')  # Fetch only rating and restaurant name fields
+    # SELECT core_rating.rating, core_restaurant.name FROM core_rating INNER JOIN core_restaurant ON core_rating.restaurant_id = core_restaurant.id;
+
     return render(request, 'core/rating_index.html', {'ratings': ratings})
