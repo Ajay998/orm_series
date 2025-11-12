@@ -1,4 +1,10 @@
 {% extends "core/base.html" %}
 {% block content %}
-{{ restaurant }}
+{% for restaurant in restaurants %}
+    <p>{{ restaurant.name }}</p>
+    <ul>
+    {% for rating in restaurant.ratings.all %}
+        <li>{{ rating.rating }}</li>
+    {% endfor %}
+{% endfor %}
 {% endblock %}
