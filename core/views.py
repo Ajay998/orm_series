@@ -1,6 +1,8 @@
 from django.shortcuts import render
 from .forms import RatingForm, RestaurantForm
-from .models import Restaurant, Rating
+from .models import Restaurant, Rating, Sale
+from django.db.models import Sum, Prefetch
+from django.utils import timezone
 # Create your views here.
 
 def submit_rating(request):
@@ -34,10 +36,34 @@ def index(request):
     # SELECT * FROM core_rating WHERE restaurant_id IN (1, 2, 3, ...);
     # SELECT * FROM core_sale WHERE restaurant_id IN (1, 2, 3, ...);
 
-    restaurants = Restaurant.objects.filter(name__startswith='C').prefetch_related('ratings', 'sales')
+    # restaurants = Restaurant.objects.filter(name__startswith='C').prefetch_related('ratings', 'sales')
     # SELECT * FROM core_restaurant WHERE name LIKE 'C%';
     # SELECT * FROM core_rating WHERE restaurant_id IN (1, 2, 3, ...);
     # SELECT * FROM core_sale WHERE restaurant_id IN (1, 2, 3, ...);
+
+    # restaurants = Restaurant.objects.prefetch_related('ratings', 'sales').filter(ratings__rating=5)
+    # SELECT * FROM core_restaurant INNER JOIN core_rating ON core_restaurant.id = core_rating.restaurant_id WHERE core_rating.rating = 5;
+    # SELECT * FROM core_rating WHERE restaurant_id IN (1, 2, 3, ...);
+    # SELECT * FROM core_sale WHERE restaurant_id IN (1, 2, 3, ...);
+    
+    # restaurants = Restaurant.objects.prefetch_related('ratings', 'sales').filter(ratings__rating=5).annotate(total=Sum('sales__income'))
+    # SELECT core_restaurant.*, SUM(core_sale.income) as total FROM core_restaurant 
+    # INNER JOIN core_rating ON core_restaurant.id = core_rating.restaurant_id 
+    # LEFT OUTER JOIN core_sale ON core_restaurant.id = core_sale.restaurant_id 
+    # WHERE core_rating.rating = 5 
+    # GROUP BY core_restaurant.id;
+
+    month_ago = timezone.now() - timezone.timedelta(days=30)
+    month_sales = Prefetch('sales', queryset=Sale.objects.filter(datetime__gte=month_ago)) # Custom prefetch to get only sales from the last month
+    restaurants = Restaurant.objects.prefetch_related('ratings', month_sales).filter(ratings__rating=5)
+    restaurants = restaurants.annotate(total=Sum('sales__income'))
+    print([r.total for r in restaurants])
+
+    # SELECT core_restaurant.* FROM core_restaurant 
+    # INNER JOIN core_rating ON core_restaurant.id = core_rating.restaurant_id 
+    # WHERE core_rating.rating = 5;
+    # SELECT * FROM core_sale WHERE restaurant_id IN (1, 2, 3, ...) AND datetime >= '2025-10-13 16:49:58.603842+00:00';
+
 
     context = {
         'restaurants': restaurants,
