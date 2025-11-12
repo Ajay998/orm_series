@@ -29,8 +29,10 @@ def create_restaurant(request):
     return render(request, 'core/restaurant_created.html', {'form': form})
 
 def index(request):
-    restaurant = Restaurant.objects.all()
+    restaurants = Restaurant.objects.prefetch_related('ratings') # Fetch all restaurants with their ratings
+    # SELECT * FROM core_restaurant;
+    # SELECT * FROM core_rating WHERE restaurant_id IN (1, 2, 3, ...);
     context = {
-        'restaurant': restaurant,
+        'restaurants': restaurants,
     }
     return render(request, 'core/index.html', context)
