@@ -1,5 +1,6 @@
 from django.shortcuts import render
 from .forms import RatingForm, RestaurantForm
+from .models import Restaurant
 # Create your views here.
 
 def submit_rating(request):
@@ -26,3 +27,10 @@ def create_restaurant(request):
     else:
         form = RestaurantForm()
     return render(request, 'core/restaurant_created.html', {'form': form})
+
+def index(request):
+    restaurant = Restaurant.objects.all()
+    context = {
+        'restaurant': restaurant,
+    }
+    return render(request, 'core/index.html', context)
