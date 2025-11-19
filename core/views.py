@@ -1,6 +1,6 @@
 from django.shortcuts import render
 from .forms import RatingForm, RestaurantForm
-from .models import Restaurant, Rating, Sale
+from .models import Restaurant, Rating, Sale, StaffRestaurant
 from django.db.models import Sum, Prefetch
 from django.utils import timezone
 # Create your views here.
@@ -53,22 +53,25 @@ def index(request):
     # WHERE core_rating.rating = 5 
     # GROUP BY core_restaurant.id;
 
-    month_ago = timezone.now() - timezone.timedelta(days=30)
-    month_sales = Prefetch('sales', queryset=Sale.objects.filter(datetime__gte=month_ago)) # Custom prefetch to get only sales from the last month
-    restaurants = Restaurant.objects.prefetch_related('ratings', month_sales).filter(ratings__rating=5)
-    restaurants = restaurants.annotate(total=Sum('sales__income'))
-    print([r.total for r in restaurants])
+    # month_ago = timezone.now() - timezone.timedelta(days=30)
+    # month_sales = Prefetch('sales', queryset=Sale.objects.filter(datetime__gte=month_ago)) # Custom prefetch to get only sales from the last month
+    # restaurants = Restaurant.objects.prefetch_related('ratings', month_sales).filter(ratings__rating=5)
+    # restaurants = restaurants.annotate(total=Sum('sales__income'))
+    # print([r.total for r in restaurants])
 
     # SELECT core_restaurant.* FROM core_restaurant 
     # INNER JOIN core_rating ON core_restaurant.id = core_rating.restaurant_id 
     # WHERE core_rating.rating = 5;
     # SELECT * FROM core_sale WHERE restaurant_id IN (1, 2, 3, ...) AND datetime >= '2025-10-13 16:49:58.603842+00:00';
 
+    jobs = StaffRestaurant.objects.prefetch_related('staff', 'restaurant')
+    for job in jobs:
+        print(f"{job.staff.name} works at {job.restaurant.name} with salary {job.salary}")
 
-    context = {
-        'restaurants': restaurants,
-    }
-    return render(request, 'core/restaurant_index.html', context)
+    # context = {
+    #     'restaurants': restaurants,
+    # }
+    return render(request, 'core/restaurant_index.html')
 
 def rating_index(request):
     # ratings = Rating.objects.select_related('restaurant') # Fetch all ratings with their associated restaurant in optimized query (One to Many relationship)
