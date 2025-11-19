@@ -1,4 +1,4 @@
-from core.models import Restaurant, Rating, Sale
+from core.models import Restaurant, Rating, Sale, Staff, StaffRestaurant
 from django.utils import timezone
 from django.db import connection
 from django.contrib.auth.models import User
@@ -250,7 +250,48 @@ def run():
     # INNER JOIN core_restaurant ON core_sale.restaurant_id = core_restaurant.id
     # WHERE core_restaurant.restaurant_type = 'CH';
 
+    # staff, created = Staff.objects.get_or_create(name='John')
+    # print(staff)
+    # print(type(staff.restaurant))
+    # staff.restaurant.add(Restaurant.objects.first())
+    # print(staff.restaurant.all())
+    # print(staff.restaurant.count())
+    # print(staff.restaurant.remove(Restaurant.objects.first()))
+    # staff.restaurant.set(Restaurant.objects.all()[:10]) # Set first 5 restaurants
+    # # SELECT * FROM core_restaurant LIMIT 5;
+    # italian = staff.restaurant.filter(restaurant_type=Restaurant.TypeChoices.ITALIAN)
+    # # SELECT * FROM core_restaurant
+    # # INNER JOIN core_staff_restaurant ON core_restaurant.id = core_staff_restaurant.restaurant_id
+    # # WHERE core_staff_restaurant.staff_id = 1 AND core_restaurant.restaurant_type = 'ITALIAN';
+    # print(italian)
+    # print(staff.restaurant.count())
 
+    # resturant = Restaurant.objects.get(pk=9)
+    # print(resturant.staff_set.all())
+    # SELECT * FROM core_staff
+    # INNER JOIN core_staff_restaurant ON core_staff.id = core_staff_restaurant.staff_id
+    # WHERE core_staff_restaurant.restaurant_id = 9;
 
-    print(connection.queries)
+    staff, created = Staff.objects.get_or_create(name='John')
+    restaurant = Restaurant.objects.first()
+    # restaurant = Restaurant.objects.last()
+    # StaffRestaurant.objects.create(
+    #     staff=staff,
+    #     restaurant=restaurant,
+    #     salary=55000.00
+    # # )
+    # StaffRestaurant.objects.create(
+    #     staff=staff,
+    #     restaurant=restaurant,
+    #     salary=26000.00
+    # )
+    # staff.restaurant.add(restaurant, through_defaults={'salary': 60000.00})
+    # print(staff.restaurant.through.objects.all())
+    import random
+    staff.restaurant.set(
+        Restaurant.objects.all()[:10],
+        through_defaults={'salary': random.randint(30000, 80000)}
+    )
+
+    # print(connection.queries)
     
